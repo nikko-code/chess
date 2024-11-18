@@ -7,7 +7,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import main.Board;
-import main.GamePanel;
 
 public class Piece {
 	
@@ -51,14 +50,6 @@ public class Piece {
 	}
 	public int getRow(int y) {
 		return (y + Board.HALF_SQUARE_SIZE)/Board.SQUARE_SIZE;
-	}
-	public  int getIndex() {
-		for(int index = 0; index < GamePanel.simPieces.size(); index++) {
-			if(GamePanel.simPieces.get(index) == this) {
-				return index;
-			}
-		}
-		return 0;
 	}
 	public void updatePosition() {
 		

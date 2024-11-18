@@ -58,7 +58,6 @@ public class Piece {
 				return index;
 			}
 		}
-		return 0;
 	}
 	public void updatePosition() {
 		
