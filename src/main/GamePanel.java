@@ -3,8 +3,10 @@ package main;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -29,7 +31,7 @@ public class GamePanel extends JPanel implements Runnable {
 	// PIECES 
 	public static ArrayList<Piece> pieces = new ArrayList<>();
 	public static ArrayList<Piece> simPieces = new ArrayList<>();
-	Piece activeP;
+	Piece activeP, castlingP; 
 	
 	
 	// COLOR
@@ -73,9 +75,9 @@ public class GamePanel extends JPanel implements Runnable {
 		pieces.add(new Knight(WHITE, 6, 7));
 		pieces.add(new Rook(WHITE, 0, 7	));
 		pieces.add(new Rook(WHITE, 7, 7));
-		pieces.add(new Bishop(WHITE, 2, 4));
+		pieces.add(new Bishop(WHITE, 2, 7));
 		pieces.add(new Bishop(WHITE, 5, 7));
-		pieces.add(new Queen(WHITE, 3, 4));
+		pieces.add(new Queen(WHITE, 3, 7));
 		pieces.add(new King(WHITE, 4, 7));
 		// Black team
 		
@@ -164,7 +166,8 @@ public class GamePanel extends JPanel implements Runnable {
 					
 					// Update the piece list in case a piece has been captured and removed during the simulation.
 					copyPieces(simPieces, pieces);
-					activeP.updatePosition(); // found in piece.java	
+					activeP.updatePosition(); // found in piece.java
+					changePlayer(); 
 				}
 				else {
 					// The move is not valid so reset everything
@@ -205,6 +208,15 @@ public class GamePanel extends JPanel implements Runnable {
 			validSquare = true;
 		}
 	}
+	private void changePlayer() {
+		if(currentColor == WHITE) {
+			currentColor = BLACK;
+		}
+		else {
+			currentColor = WHITE;
+		}
+		activeP = null;
+	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -233,6 +245,17 @@ public class GamePanel extends JPanel implements Runnable {
 			// Draw the active piece in the end so it won't be hidden by the board or the colored square
 			activeP.draw(g2);
 			
+		}
+		// STATUS MESSAGES
+		g2.setRenderingHint (RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2.setFont(new Font("Book Antiqua", Font.PLAIN, 40));
+		g2.setColor(Color.white);
+		
+		if(currentColor == WHITE) {
+			g2.drawString("White's turn", 840, 550);
+		}
+		else {
+			g2.drawString("Black's Turn", 840, 550);
 		}
 	}
 

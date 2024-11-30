@@ -16,6 +16,7 @@ public class Piece {
 	public int col, row, preCol, preRow;
 	public int color;
 	public Piece hittingP;
+	public boolean moved;
 	
 	
 	public Piece(int color, int col, int row) {
@@ -66,6 +67,7 @@ public class Piece {
 		y = getY(row);
 		preCol = getCol(x);
 		preRow = getRow(y);
+		moved = true;
 		}
 	public void resetPosition() {
 		col = preCol;
@@ -100,7 +102,7 @@ public class Piece {
 		}
 		return null;
 	}
-	public boolean isValidSquare(int targetCol, int targetRow) {
+	public boolean isValidSquare(int targetCol, int targetRow) {	
 		
 		hittingP = getHittingP(targetCol, targetRow);
 			
@@ -147,10 +149,10 @@ public class Piece {
 				}
 			}
 		}
-		// When this piece is mo	ving down
+		// When this piece is moving down
 		for(int r = preRow+1; r < targetRow; r++) {
 			for (Piece piece : GamePanel.simPieces) {
-				if(piece.col == targetCol  && piece.row == r) {
+				if(piece.col == targetCol && piece.row == r) {
 					hittingP = piece;
 					return true;
 				}

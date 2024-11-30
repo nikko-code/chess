@@ -26,7 +26,6 @@ public class Queen extends Piece{
 					
 				}
 			}
-		}
 		
 		// Diagonal
 		if(Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow)) {
@@ -34,6 +33,7 @@ public class Queen extends Piece{
 				return true;	
 			}
 		}
+	}
 		return false; 	
 	}
 }
