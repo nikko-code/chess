@@ -3,5 +3,6 @@
     <fullyQualifiedTypeName name="java.awt.Color"/>
     <fullyQualifiedTypeName name="javax.imageio.ImageIO"/>
     <fullyQualifiedTypeName name="java.io.IOException"/>
+    <fullyQualifiedTypeName name="main.Type"/>
     <fullyQualifiedTypeName name="main.Board"/>
 </qualifiedTypeNameHistroy>
