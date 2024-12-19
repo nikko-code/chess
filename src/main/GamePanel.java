@@ -55,8 +55,10 @@ public class GamePanel extends JPanel implements Runnable {
 		addMouseMotionListener(mouse);
 		addMouseListener(mouse);
 		
-	//	setPieces();
 		testIllegal();
+		
+		//setPieces();
+
 		copyPieces(pieces, simPieces);
 		
 	}
@@ -107,11 +109,17 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	
 	public void testIllegal() {
-		pieces.add(new Pawn(WHITE,7,6));
-		pieces.add(new King(WHITE, 3,7));
-		pieces.add(new King(BLACK, 0,3));
-		pieces.add(new Bishop(BLACK,1,4));
-		pieces.add(new Queen(BLACK,4,5));
+		pieces.add(new Pawn(WHITE,7,4));
+		pieces.add(new Rook(WHITE,0,7));
+		pieces.add(new Rook(WHITE,7,2));
+		pieces.add(new Queen(WHITE,1,7));
+		pieces.add(new Knight(WHITE,5,5));
+		pieces.add(new King(WHITE,7,7));
+		pieces.add(new King(BLACK,0,0));
+		pieces.add(new Pawn(BLACK,5,4));
+		pieces.add(new Pawn(BLACK,7,3));
+		pieces.add(new Bishop(BLACK,0,5));
+		
 	}
 	private void copyPieces(ArrayList<Piece> source, ArrayList<Piece> target) {
 		
@@ -257,7 +265,6 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	// For testing illegal movement of the king.
 	private	boolean isIllegal(Piece king) {
-		
 		if(king.type == Type.KING) {
 			for(Piece piece : simPieces) {
 				  if(piece != king && piece.color != king.color && piece.canMove(king.col, king.row)) {
@@ -267,13 +274,28 @@ public class GamePanel extends JPanel implements Runnable {
 		}
 		return false;
 	}
+	
+	
 	private boolean opponentCanCaptureKing() {
-		
 		
 		Piece king  = getKing(false);
 		
 		for(Piece piece : simPieces) {
 			if(piece.color != king.color && piece.canMove(king.col, king.row)) {
+				return true;
+			}
+		}
+		return false;
+			
+	}
+	
+	// copy of the function above, but checks if the opponent's king can move
+	private boolean opponentCanCaptureKing2() {
+		
+		Piece king = getKing(true);
+		
+		for(Piece piece : simPieces) {
+			if(king != null && piece.color != king.color && piece.canMove(king.col, king.row)) {
 				return true;
 			}
 		}
@@ -295,6 +317,7 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		return false;
 	}
+	
 	private Piece getKing(boolean opponent) {
 		
 		Piece king = null;
@@ -432,36 +455,40 @@ public class GamePanel extends JPanel implements Runnable {
 		return true;
 		
 	}
-	private boolean kingCanMove(Piece king) {
-		
-		// Simulate if there is any square where the king can move to (all directions)
-		if(isValidMove(king, -1, -1)) {return true;}
-		if(isValidMove(king, 0, -1)) {return true;}
-		if(isValidMove(king, 1, -1)) {return true;}
-		if(isValidMove(king, -1, 0)) {return true;}
-		if(isValidMove(king, 1, 0)) {return true;}
-		if(isValidMove(king, -1, 1)) {return true;}
-		if(isValidMove(king, 0, 1)) {return true;}
-		if(isValidMove(king, 1, 1)) {return true;}
-		
+	private boolean kingCanMove(Piece piece) {
+		// checks if king can move 1 square around itself
+		if(isValidMove(piece, -1, -1)) {return true;}
+		if(isValidMove(piece, 0, -1)) {return true;}
+		if(isValidMove(piece, 1, -1)) {return true;}
+		if(isValidMove(piece, -1, 0)) {return true;}
+		if(isValidMove(piece, 1, 0)) {return true;}
+		if(isValidMove(piece, -1, 1)) {return true;}
+		if(isValidMove(piece, 0, 1)) {return true;}
+		if(isValidMove(piece, 1, 1)) {return true;}
 		return false;
 	}
+	
 	private boolean isValidMove(Piece king, int colPlus, int rowPlus) {
 		
 		boolean isValidMove = false;
 		
 		//Update the king's position for a second
+		
 		king.col += colPlus;
 		king.row += rowPlus;
 		
 		if(king.canMove(king.col, king.row)) {
 			
-			if(king.hittingP != null) {
-				simPieces.remove(king.hittingP.getIndex());
+			// if piece is going to hit a piece remove that piece
+			if (king.hittingP != null) {
+			    simPieces.remove(king.hittingP.getIndex());
 			}
-			if(isIllegal(king) == false) {
-				isValidMove = true;
-			}
+			
+			if (king.type == Type.KING){
+				if(isIllegal(king) == false) {
+					isValidMove = true;
+				}
+			} 			
 		}
 		
 		// Reset the king's position and restore the removed piece
@@ -470,24 +497,129 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		return isValidMove;
 	}
+	
+	private boolean isValidMoveP(Piece piece, int colPlus, int rowPlus) {
+		boolean isValidMove = false;
+		
+		//update the piece's position for a second
+		
+		piece.col += colPlus;
+		piece.row += rowPlus;
+		
+		if (piece.canMove(piece.col, piece.row)) {
+			if (piece.hittingP != null ) {
+				simPieces.remove(piece.hittingP.getIndex());
+				simPieces.remove(piece.getIndex());
+			}
+			if (opponentCanCaptureKing2() == false) {
+				isValidMove = true;
+			}
+		}
+		
+		piece.resetPosition();
+		copyPieces(pieces, simPieces);
+		return isValidMove;
+	}
+	
+	// checks if piece can move , use isValidMove
+	// edited for all pieces, not just king.
+	private boolean pieceCanMove(Piece piece) {
+		
+		if(isValidMove(piece, -1, -1)) {return true;}
+		if(isValidMove(piece, 0, -1)) {return true;}
+		if(isValidMove(piece, 1, -1)) {return true;}
+		if(isValidMove(piece, -1, 0)) {return true;}
+		if(isValidMove(piece, 1, 0)) {return true;}
+		if(isValidMove(piece, -1, 1)) {return true;}
+		if(isValidMove(piece, 0, 1)) {return true;}
+		if(isValidMove(piece, 1, 1)) {return true;}
+		
+		// pawn
+		if(isValidMoveP(piece, -1, -1)) {return true;}
+		if(isValidMoveP(piece, -1, 1)) {return true;}
+		if(isValidMoveP(piece, 0, -1)) {return true;}
+		if(isValidMoveP(piece, 0, 1)) {return true;}
+		if(isValidMoveP(piece, 1, -1)) {return true;}
+		if(isValidMoveP(piece, 1, 1)) {return true;}
+
+		// knight
+		if(isValidMoveP(piece, 2, 1)) {return true;}
+		if(isValidMoveP(piece, 2, -1)) {return true;}
+		if(isValidMoveP(piece, -2, 1)) {return true;}
+		if(isValidMoveP(piece, -2, -1)) {return true;}
+		if(isValidMoveP(piece, 1, 2)) {return true;}
+		if(isValidMoveP(piece, 1, -2)) {return true;}
+		if(isValidMoveP(piece, -1, 2)) {return true;}
+		if(isValidMoveP(piece, -1, -2)) {return true;}
+		
+		// bishop, rook, and queen
+		for(int i = 0; i < 8; i++) {
+			for(int j = 0; j < 8; j++) {
+				if (i == 0) {
+					if(isValidMoveP(piece, i, j)) {return true;}
+				}
+				if (j == 0) {
+					if(isValidMoveP(piece, i, j)) {return true;}
+				}
+				if (Math.abs(i) == Math.abs(j)) {
+					if(isValidMoveP(piece, i, j)) {return true;}
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean isStalemate() {
+		/* A piece is in stalemate if 
+		 * BOTH the king cannot move (while not in check) and pieces on the board cannot move
+		 * i.e. blocked pawns or pieces pinned.
+		 */
 		
 		int count = 0;
 		// Count the number of pieces 
+		/*This counts the number of pieces of the opponents* color (black)
+		 * This will be used for identifying if only black's king is left
+		 */
+		// System.out.println(currentColor);
 		for(Piece piece : simPieces) {
 			if(piece.color != currentColor) {
 				count++;
 			}
 		}
 		
-		//
+		// If only one piece (the king) is left
 		if(count == 1) {
 			if(kingCanMove(getKing(true)) == false) {
 				return true;
 			}
+			
+		// cannot checkmate when only king is left
+		if(simPieces.size() == 2) {
+			return true;
+			}
 		}
-		return false;
+		
+		//cannot checkmate with knight and king only
+		if(simPieces.size() == 3) {
+			for (Piece piece1 :simPieces) {
+				if (piece1.type == Type.KNIGHT) {return true;}
+			}
+		}
+		
+		//checks every piece to see if they can move
+		ArrayList<Piece> tempSimPieces = new ArrayList<>(simPieces);
+		for(Piece piece : tempSimPieces) {
+			if(piece.color != currentColor) {
+				if (pieceCanMove(piece) == true) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
+	
+	
+
 	private void checkCastling() {
 		
 		if(castlingP != null) {
@@ -643,7 +775,7 @@ public class GamePanel extends JPanel implements Runnable {
 		if (stalemate) {
 			g2.setFont(new Font("Arial,", Font.PLAIN, 90));
 			g2.setColor(Color.lightGray);
-			g2.drawString(s, 170, 420);
+			g2.drawString("stalemate", 170, 420);
 			
 			}
 		}
