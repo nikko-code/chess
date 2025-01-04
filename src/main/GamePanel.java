@@ -602,7 +602,7 @@ public class GamePanel extends JPanel implements Runnable {
 		//cannot checkmate with knight and king only
 		if(simPieces.size() == 3) {
 			for (Piece piece1 :simPieces) {
-				if (piece1.type == Type.KNIGHT) {return true;}
+				if (piece1.type == Type.KNIGHT || piece1.type == Type.BISHOP) {return true;}
 			}
 		}
 		
